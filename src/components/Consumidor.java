@@ -1,16 +1,12 @@
 package components;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.MediaTracker;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class Consumidor implements Runnable {
 
-    //This list contains the size of the consumers
-    private final List<Consumidor> consumidores;
     //Declaration of producer icon url
     String imgConsumer = "../images/consumidor.gif";
     String imgSleep = "../images/dormir.png";
@@ -20,13 +16,12 @@ public class Consumidor implements Runnable {
     private volatile boolean running = true;
     private int sleepConsumer = 1500;
     Logica logica;
-    JPanel pnlConsumer;
+    JLabel lblConsumer;
 
-    public Consumidor(BlockingQueue<Integer> queue, Logica logica, JPanel pnlConsumer) {
+    public Consumidor(BlockingQueue<Integer> queue, Logica logica, JLabel lblConsumer) {
         this.queue = queue;
         this.logica = logica;
-        this.pnlConsumer = pnlConsumer;
-        this.consumidores = new ArrayList<>();
+        this.lblConsumer = lblConsumer;
     }
 
     @Override
@@ -34,11 +29,22 @@ public class Consumidor implements Runnable {
         try {
             setConsumerRunning(true);
             while (running) {
-                logica.consumir();
+                if (queue.size() != 0) {
+                    setConsumerIcon();
+                    logica.consumir();
+                    Thread.sleep(sleepConsumer);
+                    System.out.println("consumer" + queue);
+                } else {
+                    setConsumerIconSleep();
+                    Thread.sleep(5000);
+                }
+                setConsumerIconSleep();
                 Thread.sleep(sleepConsumer);
             }
+            setConsumerIcon();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -48,20 +54,27 @@ public class Consumidor implements Runnable {
     }
 
     public void setConsumerIcon() {
-        JLabel lblConsumer = new JLabel();
         //thread consumer is running? yes : no
         ImageIcon icon = new ImageIcon(getClass().getResource(running ? imgConsumer : imgSleep));
-        lblConsumer.setIcon(icon);
-        pnlConsumer.add(lblConsumer);
-        pnlConsumer.revalidate(); // Asegura que se actualice la interfaz gráfica
-        pnlConsumer.repaint();
+        if (icon.getImageLoadStatus() == MediaTracker.ERRORED) {
+            System.out.println("Consumer img failed loading...");
+        } else {
+            lblConsumer.setIcon(icon);
+        }
+    }
+
+    public void setConsumerIconSleep() {
+        ImageIcon icon = new ImageIcon(getClass().getResource(imgSleep));
+        if (icon.getImageLoadStatus() == MediaTracker.ERRORED) {
+            System.out.println("ConsumerSleep img failed loading...");
+        } else {
+            lblConsumer.setIcon(icon);
+        }
     }
 
     public void setConsumerSleepTime(int sleepTime) {
-        if (sleepTime >= 500 || sleepTime <= 2000) {
-            sleepConsumer = sleepTime;
-            System.out.println("El Consumidor ahora duerme " + sleepConsumer);
-        }
+        sleepConsumer = sleepTime;
+        System.out.println("Consumer now sleeps " + sleepConsumer + "ms");
     }
 
     public void detener() {

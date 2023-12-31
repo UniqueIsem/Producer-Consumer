@@ -1,14 +1,10 @@
 package components;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class UIMain extends javax.swing.JFrame {
-
-    private final List<Productor> productores;
-    private final List<Consumidor> consumidores;
+    
     private final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(10);
     Productor productor;
     Consumidor consumidor;
@@ -17,19 +13,20 @@ public class UIMain extends javax.swing.JFrame {
     public UIMain() {
         initComponents();
         this.setLocationRelativeTo(null);
-        this.productores = new ArrayList<>();
-        this.consumidores = new ArrayList<>();
         this.logica = new Logica(queue, pnlItems);
+        this.productor = new Productor(queue, logica, lblProducer);
+        this.consumidor = new Consumidor(queue, logica, lblConsumer);
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         pnlBody = new javax.swing.JPanel();
         pnlProducer = new javax.swing.JPanel();
+        lblProducer = new javax.swing.JLabel();
         pnlConsumer = new javax.swing.JPanel();
+        lblConsumer = new javax.swing.JLabel();
         pnlItems = new javax.swing.JPanel();
         Item1 = new javax.swing.JLabel();
         Item2 = new javax.swing.JLabel();
@@ -51,12 +48,9 @@ public class UIMain extends javax.swing.JFrame {
         lblTimeConsumer = new javax.swing.JLabel();
         txtConsumer = new javax.swing.JTextField();
         btnTimeConsumer = new javax.swing.JButton();
-        lblBody = new javax.swing.JLabel();
         pnlPC = new javax.swing.JPanel();
-        lblProducer = new javax.swing.JLabel();
-        btnAddProducer = new javax.swing.JButton();
-        btnAddConsumer = new javax.swing.JButton();
-        lblConsumer = new javax.swing.JLabel();
+        lblTitle = new javax.swing.JLabel();
+        lblBody = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,10 +58,18 @@ public class UIMain extends javax.swing.JFrame {
         pnlBody.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         pnlProducer.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 100, 40));
-        pnlBody.add(pnlProducer, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 910, 150));
+
+        lblProducer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/dormir.png"))); // NOI18N
+        pnlProducer.add(lblProducer);
+
+        pnlBody.add(pnlProducer, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 190, 150));
 
         pnlConsumer.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 100, 40));
-        pnlBody.add(pnlConsumer, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 360, 910, 150));
+
+        lblConsumer.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/dormir.png"))); // NOI18N
+        pnlConsumer.add(lblConsumer);
+
+        pnlBody.add(pnlConsumer, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 10, 210, 150));
 
         pnlItems.setLayout(new java.awt.GridLayout(2, 5, 2, 2));
         pnlItems.add(Item1);
@@ -81,9 +83,9 @@ public class UIMain extends javax.swing.JFrame {
         pnlItems.add(Item9);
         pnlItems.add(Item10);
 
-        pnlBody.add(pnlItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 910, 160));
+        pnlBody.add(pnlItems, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 910, 210));
 
-        pnlBtns.setLayout(new java.awt.GridLayout());
+        pnlBtns.setLayout(new java.awt.GridLayout(1, 0));
 
         btnStart.setBackground(new java.awt.Color(51, 204, 0));
         btnStart.setForeground(new java.awt.Color(0, 0, 0));
@@ -98,6 +100,7 @@ public class UIMain extends javax.swing.JFrame {
         btnStop.setBackground(new java.awt.Color(204, 0, 0));
         btnStop.setForeground(new java.awt.Color(0, 0, 0));
         btnStop.setText("STOP");
+        btnStop.setEnabled(false);
         btnStop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnStopActionPerformed(evt);
@@ -105,7 +108,7 @@ public class UIMain extends javax.swing.JFrame {
         });
         pnlBtns.add(btnStop);
 
-        pnlBody.add(pnlBtns, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 520, 220, 60));
+        pnlBody.add(pnlBtns, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 400, 220, 120));
 
         pnlTime.setLayout(new java.awt.GridLayout(2, 3, 3, 3));
 
@@ -133,46 +136,18 @@ public class UIMain extends javax.swing.JFrame {
         });
         pnlTime.add(btnTimeConsumer);
 
-        pnlBody.add(pnlTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 520, 410, 60));
-        pnlBody.add(lblBody, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 843, 508));
+        pnlBody.add(pnlTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 410, 120));
 
         pnlPC.setBackground(new java.awt.Color(0, 0, 0));
-        pnlPC.setLayout(new java.awt.GridBagLayout());
+        pnlPC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 0, 0)));
 
-        lblProducer.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        lblProducer.setForeground(new java.awt.Color(255, 255, 255));
-        lblProducer.setText("Producer");
-        pnlPC.add(lblProducer, new java.awt.GridBagConstraints());
+        lblTitle.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        lblTitle.setForeground(new java.awt.Color(255, 255, 255));
+        lblTitle.setText("Producer Consumer");
+        pnlPC.add(lblTitle);
+        pnlPC.add(lblBody);
 
-        btnAddProducer.setText("Add Producer");
-        btnAddProducer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddProducerActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        pnlPC.add(btnAddProducer, gridBagConstraints);
-
-        btnAddConsumer.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        btnAddConsumer.setText("Add Consumer");
-        btnAddConsumer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddConsumerActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        pnlPC.add(btnAddConsumer, gridBagConstraints);
-
-        lblConsumer.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        lblConsumer.setForeground(new java.awt.Color(255, 255, 255));
-        lblConsumer.setText("Consumer");
-        pnlPC.add(lblConsumer, new java.awt.GridBagConstraints());
-
-        pnlBody.add(pnlPC, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 520, 250, 60));
+        pnlBody.add(pnlPC, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 10, 250, 40));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -189,19 +164,20 @@ public class UIMain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        /*productor = new Productor(queue, logica, pnlProducer);
-        consumidor = new Consumidor(queue, logica, pnlConsumer);
-
         Thread producerThread = new Thread(productor);
         Thread consumerThread = new Thread(consumidor);
 
         producerThread.start();
-        consumerThread.start();*/
+        consumerThread.start();
+        btnStart.setEnabled(false);
+        btnStop.setEnabled(true);
     }//GEN-LAST:event_btnStartActionPerformed
 
     private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
         productor.detener();
-        consumidor.detener();
+        //consumidor.detener();
+        btnStop.setEnabled(false);
+        btnStart.setEnabled(true);
     }//GEN-LAST:event_btnStopActionPerformed
 
     private void btnTimeProducerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTimeProducerActionPerformed
@@ -215,20 +191,6 @@ public class UIMain extends javax.swing.JFrame {
         consumidor.setConsumerSleepTime(time);
         txtConsumer.setText("");
     }//GEN-LAST:event_btnTimeConsumerActionPerformed
-
-    private void btnAddProducerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddProducerActionPerformed
-        productor = new Productor(queue, logica, pnlProducer);
-        productores.add(productor);
-        Thread productorThread = new Thread(productor);
-        productorThread.start();
-    }//GEN-LAST:event_btnAddProducerActionPerformed
-
-    private void btnAddConsumerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddConsumerActionPerformed
-        consumidor = new Consumidor(queue, logica, pnlConsumer);
-        consumidores.add(consumidor);
-        Thread consumidorThread = new Thread(consumidor);
-        consumidorThread.start();
-    }//GEN-LAST:event_btnAddConsumerActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -274,8 +236,6 @@ public class UIMain extends javax.swing.JFrame {
     private javax.swing.JLabel Item7;
     private javax.swing.JLabel Item8;
     private javax.swing.JLabel Item9;
-    private javax.swing.JButton btnAddConsumer;
-    private javax.swing.JButton btnAddProducer;
     private javax.swing.JButton btnStart;
     private javax.swing.JButton btnStop;
     private javax.swing.JButton btnTimeConsumer;
@@ -285,6 +245,7 @@ public class UIMain extends javax.swing.JFrame {
     private javax.swing.JLabel lblProducer;
     private javax.swing.JLabel lblTimeConsumer;
     private javax.swing.JLabel lblTimeProducer;
+    private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel pnlBody;
     private javax.swing.JPanel pnlBtns;
     private javax.swing.JPanel pnlConsumer;

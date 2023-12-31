@@ -1,16 +1,12 @@
 package components;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.MediaTracker;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class Productor implements Runnable {
 
-    //This list contains the size of producers
-    private final List<Productor> productores;
     //Declaration of producer icon url
     String imgProducer = "../images/productor.gif";
     String imgSleep = "../images/dormir.png";
@@ -20,13 +16,12 @@ public class Productor implements Runnable {
     private volatile boolean running = true;
     private int sleepProducer = 1000;
     Logica logica;
-    JPanel pnlProducer;
+    JLabel lblProducer;
 
-    public Productor(BlockingQueue<Integer> queue, Logica logica, JPanel pnlProducer) {
+    public Productor(BlockingQueue<Integer> queue, Logica logica, JLabel lblProducer) {
         this.queue = queue;
         this.logica = logica;
-        this.pnlProducer = pnlProducer;
-        this.productores = new ArrayList<>();
+        this.lblProducer = lblProducer;
     }
 
     @Override
@@ -34,11 +29,22 @@ public class Productor implements Runnable {
         try {
             setProducerRunning(true);
             while (running) {
-                logica.producir();
+                if (queue.size() <= 9) {
+                    setProducerIcon();
+                    logica.producir();
+                    Thread.sleep(sleepProducer);
+                    System.out.println("producer" + queue);
+                } else {
+                    setProducerIconSleep();
+                    Thread.sleep(5000);
+                }
+                setProducerIconSleep();
                 Thread.sleep(sleepProducer);
             }
+            setProducerIcon();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -47,23 +53,28 @@ public class Productor implements Runnable {
         setProducerIcon();
     }
 
-    //Creates a new lbl on pnlProducer with a dynamic icon
     public void setProducerIcon() {
-        JLabel lblProducer = new JLabel();
         //thread producer is running? yes : no
         ImageIcon icon = new ImageIcon(getClass().getResource(running ? imgProducer : imgSleep));
-        lblProducer.setIcon(icon);
-        pnlProducer.add(lblProducer);
-        pnlProducer.revalidate(); // Asegura que se actualice la interfaz gráfica
-        pnlProducer.repaint();
+        if (icon.getImageLoadStatus() == MediaTracker.ERRORED) {
+            System.out.println("Producer img failed loading...");
+        } else {
+            lblProducer.setIcon(icon);
+        }
+    }
 
+    public void setProducerIconSleep() {
+        ImageIcon icon = new ImageIcon(getClass().getResource(imgSleep));
+        if (icon.getImageLoadStatus() == MediaTracker.ERRORED) {
+            System.out.println("ProducerSleepig img failed loading...");
+        } else {
+            lblProducer.setIcon(icon);
+        }
     }
 
     public void setProducerSleepTime(int sleepTime) {
-        if (sleepTime >= 500 || sleepTime <= 2000) {
-            sleepProducer = sleepTime;
-            System.out.println("El Productor ahora duerme " + sleepProducer);
-        }
+        sleepProducer = sleepTime;
+        System.out.println("Producer now sleeps " + sleepProducer + "ms");
     }
 
     public void detener() {
